@@ -6,126 +6,228 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>471</width>
-    <height>350</height>
+    <width>561</width>
+    <height>503</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QHBoxLayout" name="horizontalLayout">
+   <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
-       <layout class="QGridLayout" name="gridLayout">
-        <item row="0" column="0">
-         <widget class="QLabel" name="path_to_emails">
-          <property name="text">
-           <string>path to mails</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1" colspan="2">
-         <widget class="QLineEdit" name="email_path_edit"/>
-        </item>
-        <item row="0" column="3">
-         <widget class="QPushButton" name="pushButton">
-          <property name="text">
-           <string>browse</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0" colspan="2">
-         <widget class="QLabel" name="label">
-          <property name="text">
-           <string>Invoice Template</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="QLineEdit" name="invoice_template_edit"/>
-        </item>
-        <item row="1" column="3" rowspan="2">
-         <widget class="QPushButton" name="invoice_button">
-          <property name="text">
-           <string>browse</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0" rowspan="2">
-         <widget class="QLabel" name="label_2">
-          <property name="text">
-           <string>signature</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1" rowspan="2" colspan="2">
-         <widget class="QLineEdit" name="signature_path_edit"/>
-        </item>
-        <item row="3" column="3">
-         <widget class="QPushButton" name="signature_button">
-          <property name="text">
-           <string>browse</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0">
-         <widget class="QLabel" name="start_number_label">
-          <property name="text">
-           <string>Start Number</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1" colspan="2">
-         <widget class="QLineEdit" name="start_number_edit"/>
-        </item>
-        <item row="4" column="3">
-         <widget class="QPushButton" name="start_button">
-          <property name="text">
-           <string>Start</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <widget class="QLabel" name="status_label">
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="path_to_emails">
         <property name="text">
-         <string>status</string>
+         <string>path to mails</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" colspan="2">
+       <widget class="QLineEdit" name="email_path_edit"/>
+      </item>
+      <item row="0" column="3">
+       <widget class="QPushButton" name="pushButton">
+        <property name="text">
+         <string>browse</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="2">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Invoice Template</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QLineEdit" name="invoice_template_edit"/>
+      </item>
+      <item row="1" column="3" rowspan="2">
+       <widget class="QPushButton" name="invoice_button">
+        <property name="text">
+         <string>browse</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" rowspan="2">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>signature</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" rowspan="2" colspan="2">
+       <widget class="QLineEdit" name="signature_path_edit"/>
+      </item>
+      <item row="3" column="3">
+       <widget class="QPushButton" name="signature_button">
+        <property name="text">
+         <string>browse</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="start_number_label">
+        <property name="text">
+         <string>Start Number</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1" colspan="2">
+       <widget class="QLineEdit" name="start_number_edit"/>
+      </item>
+      <item row="4" column="3">
+       <widget class="QPushButton" name="start_button">
+        <property name="text">
+         <string>Start</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QLabel" name="status_label">
+      <property name="text">
+       <string>status</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="value_label">
+      <property name="text">
+       <string>Total bills generated including tax: Rs %1, tax collected: Rs %2</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="checkBox">
+      <property name="text">
+       <string>Manual Bill: following filelds are to be used only for producing a maual bill</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Item Name</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="value_label">
+       <widget class="QLineEdit" name="itemNameField"/>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QLabel" name="label_5">
         <property name="text">
-         <string>Total bills generated including tax: Rs %1, tax collected: Rs %2</string>
+         <string>Quantity</string>
         </property>
        </widget>
       </item>
       <item>
-       <spacer name="verticalSpacer">
+       <widget class="QLineEdit" name="quantityField"/>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_2">
         <property name="orientation">
-         <enum>Qt::Vertical</enum>
+         <enum>Qt::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>20</width>
-          <height>40</height>
+          <width>40</width>
+          <height>20</height>
          </size>
         </property>
        </spacer>
       </item>
+      <item>
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>Price</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="priceField"/>
+      </item>
      </layout>
     </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <item>
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>Address</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTextEdit" name="addressField"/>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="manualGenerateButton">
+        <property name="text">
+         <string>generate</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QLabel" name="manualBillStatus">
+      <property name="text">
+       <string>manual bill status</string>
+      </property>
+     </widget>
+    </item>
    </layout>
+   <zorder>label_4</zorder>
+   <zorder>label_5</zorder>
+   <zorder>itemNameField</zorder>
+   <zorder>quantityField</zorder>
+   <zorder>pushButton_2</zorder>
+   <zorder>label_6</zorder>
+   <zorder>addressField</zorder>
+   <zorder>label_7</zorder>
+   <zorder>priceField</zorder>
+   <zorder>horizontalSpacer</zorder>
+   <zorder>manualGenerateButton</zorder>
+   <zorder>horizontalSpacer_2</zorder>
+   <zorder>manualBillStatus</zorder>
+   <zorder>addressField</zorder>
+   <zorder>label_6</zorder>
+   <zorder>checkBox</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>471</width>
+     <width>561</width>
      <height>19</height>
     </rect>
    </property>

@@ -27,6 +27,10 @@ private slots:
 
     void on_signature_button_clicked();
 
+    void on_checkBox_toggled(bool checked);
+
+    void on_manualGenerateButton_clicked();
+
 private:
     void loadSettings();
     void saveSetttings();
@@ -34,7 +38,9 @@ private:
     void processDateFiles(QString &date, QStringList &filetoProcess);
     void printpdf();
     void printCustomerBill(const QDate &date, QVariantList sameCustomerList);
+//    void billHtmlSave();
     void delay(int seconds);
+    void writeTotalTxt();
 
     Ui::MainWindow *ui;
 

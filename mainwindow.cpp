@@ -12,7 +12,8 @@
 //#include <QWebEngineView>
 
 const QString itemLine("<tr class=\"item\"> <td>$itemNamePlaceholder</td> <td>$price</td> <td>$quantity</td> <td>$total</td> </tr>\n");
-const double taxRate(13.125);
+const QString billNumberPrefix = "E";
+const double taxRate(5.25);
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -21,6 +22,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     totalSold = 0;
     totalTaxCollected = 0;
+    on_checkBox_toggled(false);
+
     m_settings = new QSettings("hoverbirds", "invoice", this);
     loadSettings();
 }
@@ -101,6 +104,24 @@ void MainWindow::processFiles()
     printpdf();
 
     ui->value_label->setText(QString(ui->value_label->text()).arg(totalSold).arg(totalTaxCollected));
+
+    writeTotalTxt();
+}
+
+
+void MainWindow::writeTotalTxt()
+{
+     QFile totalFile(ui->email_path_edit->text() + "/pdfs/totals.txt");
+
+     if (!totalFile.open(QFile::ReadWrite)) {
+         qDebug("failed to open file for  writing");
+         return;
+     }
+
+     QTextStream out(&totalFile);
+     out << "Total sold including tax: " << totalSold << "\n";
+     out << "Total tax collected: " << totalTaxCollected << "\n";
+
 }
 
 
@@ -255,16 +276,17 @@ void MainWindow::printCustomerBill(const QDate &date, QVariantList sameCustomerL
 
     htmlString.replace("$items_tags", htmlItemLine);
     htmlString.replace("$subtotal", QString("%1").arg(subtotal));
+    htmlString.replace("$taxRate", QString("%1").arg(taxRate));
     htmlString.replace("$taxes", QString("%1").arg(taxes));
     htmlString.replace("$grandtotal", QString("%1").arg(grandTotal));
     htmlString.replace("$signature", ui->signature_path_edit->text());
-    htmlString.replace("$invoice_number", ui->start_number_edit->text());
+    htmlString.replace("$invoice_number", billNumberPrefix + ui->start_number_edit->text());
 
     // udate session totals
     totalSold += grandTotal;
     totalTaxCollected += taxes;
 
-    QString printFile = ui->email_path_edit->text() + "/pdfs/bill_no_" + ui->start_number_edit->text() + ".pdf";
+    QString printFile = ui->email_path_edit->text() + "/pdfs/bill_no_" + billNumberPrefix + ui->start_number_edit->text() + ".pdf";
     qDebug() << "pdf file name: " << printFile;
 
 
@@ -303,6 +325,11 @@ void MainWindow::printCustomerBill(const QDate &date, QVariantList sameCustomerL
 
 }
 
+//void MainWindow::billHtmlSave(QString date, QString htmlBillingAddress, QString )
+//{
+
+//}
+
 
 void MainWindow::on_invoice_button_clicked()
 {
@@ -331,4 +358,27 @@ void MainWindow::delay(int seconds)
     QTime dieTime= QTime::currentTime().addSecs(seconds);
     while (QTime::currentTime() < dieTime)
         QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+}
+
+void MainWindow::on_checkBox_toggled(bool checked)
+{
+   ui->itemNameField->setEnabled(checked);
+   ui->quantityField->setEnabled(checked);
+   ui->priceField->setEnabled(checked);
+   ui->addressField->setEnabled(checked);
+   ui->manualGenerateButton->setEnabled(checked);
+}
+
+void MainWindow::on_manualGenerateButton_clicked()
+{
+    if (ui->itemNameField->text().isEmpty() ||
+            ui->quantityField->text().isEmpty() ||
+            ui->priceField->text().isEmpty() ||
+            ui->addressField->document()->isEmpty())
+    {
+        ui->manualBillStatus->setText("missing field, please enter item details and try again");
+        return;
+    }
+
+    qDebug() << "generating manual bill";
 }
