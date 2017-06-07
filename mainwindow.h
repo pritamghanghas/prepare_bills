@@ -5,6 +5,15 @@
 #include <QVariantMap>
 #include <QSettings>
 
+
+class ItemEntries
+{
+public:
+    QString itemName;
+    int quantity;
+    double price;
+};
+
 namespace Ui {
 class MainWindow;
 }
@@ -31,6 +40,8 @@ private slots:
 
     void on_manualGenerateButton_clicked();
 
+    void on_addItemButton_clicked();
+
 private:
     void loadSettings();
     void saveSetttings();
@@ -38,7 +49,8 @@ private:
     void processDateFiles(QString &date, QStringList &filetoProcess);
     void printpdf();
     void printCustomerBill(const QDate &date, QVariantList sameCustomerList);
-//    void billHtmlSave();
+    void billHtmlSave(const QDate &date, QString htmlBillingAddress,
+                     QList<ItemEntries> &itemDescriptions, double taxRate);
     void delay(int seconds);
     void writeTotalTxt();
 
@@ -51,7 +63,11 @@ private:
 
     QMap<QString, QStringList> dateToFiles;
 
+    QList<ItemEntries> m_manualItemDescs;
+
     QSettings *m_settings;
 };
+
+
 
 #endif // MAINWINDOW_H

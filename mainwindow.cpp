@@ -13,7 +13,7 @@
 
 const QString itemLine("<tr class=\"item\"> <td>$itemNamePlaceholder</td> <td>$price</td> <td>$quantity</td> <td>$total</td> </tr>\n");
 const QString billNumberPrefix = "E";
-const double taxRate(5.25);
+const double TAX_RATE(5.25);
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -22,6 +22,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     totalSold = 0;
     totalTaxCollected = 0;
+    ui->billDateEdit->setDate(QDate::currentDate());
     on_checkBox_toggled(false);
 
     m_settings = new QSettings("hoverbirds", "invoice", this);
@@ -35,6 +36,7 @@ void MainWindow::loadSettings()
     ui->invoice_template_edit->setText(m_settings->value("invoice-template", defaultPath).toString());
     ui->signature_path_edit->setText(m_settings->value("signature-file", defaultPath).toString());
     ui->start_number_edit->setText(m_settings->value("invoice_number", "1").toString());
+    ui->taxRateField->setText(m_settings->value("tax_rate", "5.25").toString());
 }
 
 void MainWindow::saveSetttings()
@@ -43,6 +45,7 @@ void MainWindow::saveSetttings()
     m_settings->setValue("invoice-template", ui->invoice_template_edit->text());
     m_settings->setValue("signature-file", ui->signature_path_edit->text());
     m_settings->setValue("invoice_number", ui->start_number_edit->text());
+    m_settings->setValue("tax_rate", ui->taxRateField->text());
 }
 
 MainWindow::~MainWindow()
@@ -213,29 +216,14 @@ void MainWindow::printpdf()
             QString billerName = biller.toString();
             QVariantList sameCustomerList = customerMap.value(biller.toString()).toList();
             printCustomerBill(billDate, sameCustomerList);
-
-            //upade bill number in prepartion for next bill
-            int currentBillNo = ui->start_number_edit->text().toInt();
-            currentBillNo++;
-            ui->start_number_edit->setText(QString("%1").arg(currentBillNo));
         }
     }
 }
 
 void MainWindow::printCustomerBill(const QDate &date, QVariantList sameCustomerList)
 {
-    QFile file(ui->invoice_template_edit->text());
-    if(!file.open(QFile::ReadOnly)) {
-        qDebug() << "something wrong with html template file";
-    }
-
-    QString htmlString = file.readAll();
-
-    htmlString.replace("$date", date.toString("MMMM d, yyyy"));
-
     QString billingAddress;
-    double subtotal = 0;
-    QString htmlItemLine;
+    QList<ItemEntries> itemDescriptions;
     Q_FOREACH(const QVariant itemData, sameCustomerList) {
         QVariantMap itemDetails = itemData.toMap();
         if (billingAddress.isEmpty()) {
@@ -244,39 +232,63 @@ void MainWindow::printCustomerBill(const QDate &date, QVariantList sameCustomerL
                 billingAddress += line;
                 billingAddress += "<br>";
             }
-            htmlString.replace("$billing_address", billingAddress);
         }
 
-        QString itemName = itemDetails.value("item").toString();
+        ItemEntries itemDesc;
 
-        int quantity = itemDetails.value("quantity").toInt();
+        itemDesc.itemName = itemDetails.value("item").toString();
 
-        double priceWithTax = itemDetails.value("price").toString().replace(",", "").toDouble();
+        itemDesc.quantity = itemDetails.value("quantity").toInt();
 
-        double price = priceWithTax/(1.0+taxRate/100);
+        itemDesc.price  = itemDetails.value("price").toString().replace(",", "").toDouble();
 
-        double total = price*quantity;
+        itemDescriptions << itemDesc;
+    }
+
+    billHtmlSave(date,billingAddress,itemDescriptions, ui->taxRateField->text().toFloat());
+}
+
+void MainWindow::billHtmlSave(const QDate &date, QString htmlBillingAddress,
+                              QList<ItemEntries> &itemDescriptions, double taxRate)
+{
+    QFile file(ui->invoice_template_edit->text());
+    if(!file.open(QFile::ReadOnly)) {
+        qDebug() << "something wrong with html template file";
+        return;
+    }
+
+    QString htmlString = file.readAll();
+
+    htmlString.replace("$date", date.toString("MMMM d, yyyy"));
+    htmlString.replace("$billing_address", htmlBillingAddress);
+
+    double subtotal = 0;
+    QString htmlItemLine;
+
+    Q_FOREACH(const ItemEntries &itemDesc, itemDescriptions) {
+
+        // convert price including tax to price without tax
+        double price = itemDesc.price/(1.0+taxRate/100);
+
+        double total = price*itemDesc.quantity;
 
         subtotal += total;
 
-
-
         htmlItemLine += itemLine;
-        htmlItemLine.replace("$itemNamePlaceholder", itemName);
-        htmlItemLine.replace("$item", itemName);
-        htmlItemLine.replace("$quantity", QString("%1").arg(quantity));
+        htmlItemLine.replace("$itemNamePlaceholder", itemDesc.itemName);
+        htmlItemLine.replace("$quantity", QString("%1").arg(itemDesc.quantity));
         htmlItemLine.replace("$price", QString("%1").arg(price));
         htmlItemLine.replace("$total", QString("%1").arg(total));
 
-
     }
+
 
     double taxes = subtotal*(taxRate/100);
     double grandTotal = subtotal + taxes;
 
     htmlString.replace("$items_tags", htmlItemLine);
     htmlString.replace("$subtotal", QString("%1").arg(subtotal));
-    htmlString.replace("$taxRate", QString("%1").arg(taxRate));
+    htmlString.replace("$taxRate", QString("%1%").arg(taxRate));
     htmlString.replace("$taxes", QString("%1").arg(taxes));
     htmlString.replace("$grandtotal", QString("%1").arg(grandTotal));
     htmlString.replace("$signature", ui->signature_path_edit->text());
@@ -323,12 +335,12 @@ void MainWindow::printCustomerBill(const QDate &date, QVariantList sameCustomerL
     fileToWrite.write(htmlString.toStdString().c_str());
 #endif
 
+
+    //upade bill number in prepartion for next bill
+    int currentBillNo = ui->start_number_edit->text().toInt();
+    currentBillNo++;
+    ui->start_number_edit->setText(QString("%1").arg(currentBillNo));
 }
-
-//void MainWindow::billHtmlSave(QString date, QString htmlBillingAddress, QString )
-//{
-
-//}
 
 
 void MainWindow::on_invoice_button_clicked()
@@ -371,14 +383,50 @@ void MainWindow::on_checkBox_toggled(bool checked)
 
 void MainWindow::on_manualGenerateButton_clicked()
 {
+    if (m_manualItemDescs.isEmpty()) {
+        ui->manualBillStatus->setText("no items have been added to this manual bill");
+        return;
+    }
+
+    if (ui->addressField->toPlainText().isEmpty()) {
+        ui->manualBillStatus->setText("address filed is empty");
+        return;
+    }
+
+
+    qDebug() << "generating manual bill";
+
+    QString billingAddress = ui->addressField->toHtml();
+
+    billHtmlSave(ui->billDateEdit->date(), billingAddress, m_manualItemDescs, ui->taxRateField->text().toFloat());
+
+    ui->manualBillStatus->setText("manual bill generated and saved");
+}
+
+void MainWindow::on_addItemButton_clicked()
+{
     if (ui->itemNameField->text().isEmpty() ||
             ui->quantityField->text().isEmpty() ||
-            ui->priceField->text().isEmpty() ||
-            ui->addressField->document()->isEmpty())
+            ui->priceField->text().isEmpty())
     {
         ui->manualBillStatus->setText("missing field, please enter item details and try again");
         return;
     }
 
-    qDebug() << "generating manual bill";
+    ItemEntries itemDesc;
+    itemDesc.itemName = ui->itemNameField->text();
+    itemDesc.quantity = ui->quantityField->text().toInt();
+    itemDesc.price = ui->priceField->text().toDouble();
+
+    QString itemHtml = ui->itemsEdit->toHtml();
+    itemHtml += itemLine;
+
+    itemHtml.replace("$itemNamePlaceholder", itemDesc.itemName);
+    itemHtml.replace("$quantity", QString("%1").arg(itemDesc.quantity));
+    itemHtml.replace("$price", QString("%1").arg(itemDesc.price));
+    itemHtml.replace("$total", QString(""));
+
+    ui->itemsEdit->setHtml(itemHtml);
+
+    m_manualItemDescs << itemDesc;
 }
