@@ -50,7 +50,7 @@ private:
     void printpdf();
     void printCustomerBill(const QDate &date, QVariantList sameCustomerList);
     void billHtmlSave(const QDate &date, QString htmlBillingAddress,
-                     QList<ItemEntries> &itemDescriptions, double taxRate);
+                     QList<ItemEntries> &itemDescriptions, double taxRate, double shipping = 0);
     void delay(int seconds);
     void writeTotalTxt();
 

@@ -166,6 +166,16 @@
        <widget class="QLineEdit" name="priceField"/>
       </item>
       <item>
+       <widget class="QLabel" name="label_9">
+        <property name="text">
+         <string>Shipping</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="shipping_edit"/>
+      </item>
+      <item>
        <widget class="QLabel" name="label_3">
         <property name="text">
          <string>Bill Date</string>

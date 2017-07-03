@@ -12,6 +12,7 @@
 //#include <QWebEngineView>
 
 const QString itemLine("<tr class=\"item\"> <td>$itemNamePlaceholder</td> <td>$price</td> <td>$quantity</td> <td>$total</td> </tr>\n");
+const QString shippingLine("<tr class=\"shipping\"> <td></td> <td></td> <td>Shipping Charges:</td> <td> $shipping </td> </tr>");
 const QString billNumberPrefix = "E";
 const double TAX_RATE(5.25);
 
@@ -249,7 +250,7 @@ void MainWindow::printCustomerBill(const QDate &date, QVariantList sameCustomerL
 }
 
 void MainWindow::billHtmlSave(const QDate &date, QString htmlBillingAddress,
-                              QList<ItemEntries> &itemDescriptions, double taxRate)
+                              QList<ItemEntries> &itemDescriptions, double taxRate, double shipping)
 {
     QFile file(ui->invoice_template_edit->text());
     if(!file.open(QFile::ReadOnly)) {
@@ -290,7 +291,17 @@ void MainWindow::billHtmlSave(const QDate &date, QString htmlBillingAddress,
     htmlString.replace("$subtotal", QString("%1").arg(subtotal));
     htmlString.replace("$taxRate", QString("%1%").arg(taxRate));
     htmlString.replace("$taxes", QString("%1").arg(taxes));
-    htmlString.replace("$grandtotal", QString("%1").arg(grandTotal));
+
+
+    // shipping is a special case and is used only when shipping is non zero
+    QString shippingChargesLine;
+    if(shipping) {
+        shippingChargesLine = shippingLine;
+        shippingChargesLine.replace("$shipping", QString("%1").arg(shipping));
+    }
+    htmlString.replace("$shipping_line", shippingChargesLine);
+
+    htmlString.replace("$grandtotal", QString("%1").arg(grandTotal+shipping));
     htmlString.replace("$signature", ui->signature_path_edit->text());
     htmlString.replace("$invoice_number", billNumberPrefix + ui->start_number_edit->text());
 
@@ -398,7 +409,8 @@ void MainWindow::on_manualGenerateButton_clicked()
 
     QString billingAddress = ui->addressField->toHtml();
 
-    billHtmlSave(ui->billDateEdit->date(), billingAddress, m_manualItemDescs, ui->taxRateField->text().toFloat());
+    billHtmlSave(ui->billDateEdit->date(), billingAddress, m_manualItemDescs,
+                 ui->taxRateField->text().toFloat(), ui->shipping_edit->text().toFloat());
 
     ui->manualBillStatus->setText("manual bill generated and saved");
 }
