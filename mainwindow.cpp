@@ -39,6 +39,7 @@ void MainWindow::loadSettings()
     ui->start_number_edit->setText(m_settings->value("invoice_number", "1").toString());
     ui->cgst_field->setText(m_settings->value("cgst_tax_rate", "9").toString());
     ui->sgst_field->setText(m_settings->value("sgst_tax_rate", "9").toString());
+    ui->gst_number->setText(m_settings->value("gstin").toString());
 }
 
 void MainWindow::saveSetttings()
@@ -49,6 +50,7 @@ void MainWindow::saveSetttings()
     m_settings->setValue("invoice_number", ui->start_number_edit->text());
     m_settings->setValue("cgst_tax_rate", ui->cgst_field->text());
     m_settings->setValue("sgst_tax_rate", ui->sgst_field->text());
+    m_settings->setValue("gstin", ui->gst_number->text());
 }
 
 MainWindow::~MainWindow()
@@ -290,6 +292,7 @@ void MainWindow::billHtmlSave(const QDate &date, QString htmlBillingAddress,
     double sgst_taxes = subtotal*(sgstTaxRate/100);
     double grandTotal = subtotal + cgst_taxes + sgst_taxes;
 
+    htmlString.replace("$gst", ui->gst_number->text());
     htmlString.replace("$items_tags", htmlItemLine);
     htmlString.replace("$subtotal", QString("%1").arg(subtotal));
     htmlString.replace("$cgstTaxRate", QString("%1%").arg(cgstTaxRate));

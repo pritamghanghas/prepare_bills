@@ -24,59 +24,93 @@
     </item>
     <item>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="5" column="0">
-       <widget class="QLabel" name="start_number_label">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_8">
         <property name="text">
-         <string>Start Number</string>
+         <string>GSTIN</string>
         </property>
        </widget>
       </item>
-      <item row="5" column="1" colspan="4">
-       <widget class="QLineEdit" name="start_number_edit"/>
+      <item row="0" column="1" colspan="3">
+       <widget class="QLineEdit" name="gst_number"/>
       </item>
       <item row="1" column="0" colspan="2">
-       <widget class="QLabel" name="sgst_label">
-        <property name="text">
-         <string>Tax Rate(sgst)</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0" colspan="2">
        <widget class="QLabel" name="cgst_label">
         <property name="text">
          <string>Tax Rate(cgst)</string>
         </property>
        </widget>
       </item>
-      <item row="5" column="5">
-       <widget class="QPushButton" name="start_button">
+      <item row="1" column="3">
+       <widget class="QLineEdit" name="cgst_field">
         <property name="text">
-         <string>Start</string>
+         <string>5.25</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="0" colspan="2">
-       <widget class="QLabel" name="label">
+      <item row="1" column="4">
+       <widget class="QLabel" name="sgst_label">
         <property name="text">
-         <string>Invoice Template</string>
+         <string>Tax Rate(sgst)</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
+      <item row="1" column="5">
+       <widget class="QLineEdit" name="sgst_field">
+        <property name="text">
+         <string>5.25</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="2">
        <widget class="QLabel" name="path_to_emails">
         <property name="text">
          <string>path to mails</string>
         </property>
        </widget>
       </item>
-      <item row="4" column="1" colspan="4">
+      <item row="2" column="2" rowspan="2" colspan="4">
+       <widget class="QLineEdit" name="email_path_edit"/>
+      </item>
+      <item row="2" column="6">
+       <widget class="QPushButton" name="pushButton">
+        <property name="text">
+         <string>browse</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="6" rowspan="2">
+       <widget class="QPushButton" name="invoice_button">
+        <property name="text">
+         <string>browse</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" colspan="3">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Invoice Template</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="3" colspan="3">
+       <widget class="QLineEdit" name="invoice_template_edit"/>
+      </item>
+      <item row="5" column="0" colspan="2">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>signature</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="2" colspan="4">
        <widget class="QLineEdit" name="signature_path_edit">
         <property name="enabled">
          <bool>false</bool>
         </property>
        </widget>
       </item>
-      <item row="4" column="5">
+      <item row="5" column="6">
        <widget class="QPushButton" name="signature_button">
         <property name="enabled">
          <bool>false</bool>
@@ -86,46 +120,22 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="1" colspan="4">
-       <widget class="QLineEdit" name="email_path_edit"/>
-      </item>
-      <item row="2" column="5">
-       <widget class="QPushButton" name="pushButton">
+      <item row="6" column="0" colspan="2">
+       <widget class="QLabel" name="start_number_label">
         <property name="text">
-         <string>browse</string>
+         <string>Start Number</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="5">
-       <widget class="QPushButton" name="invoice_button">
+      <item row="6" column="2" colspan="4">
+       <widget class="QLineEdit" name="start_number_edit"/>
+      </item>
+      <item row="6" column="6">
+       <widget class="QPushButton" name="start_button">
         <property name="text">
-         <string>browse</string>
+         <string>Start</string>
         </property>
        </widget>
-      </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>signature</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2">
-       <widget class="QLineEdit" name="cgst_field">
-        <property name="text">
-         <string>5.25</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2">
-       <widget class="QLineEdit" name="sgst_field">
-        <property name="text">
-         <string>5.25</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="2">
-       <widget class="QLineEdit" name="invoice_template_edit"/>
       </item>
      </layout>
     </item>
@@ -269,6 +279,9 @@
    <zorder></zorder>
    <zorder>sgst_label</zorder>
    <zorder>sgst_field</zorder>
+   <zorder>label_8</zorder>
+   <zorder>gst_number</zorder>
+   <zorder></zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
