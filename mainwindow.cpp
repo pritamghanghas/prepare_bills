@@ -101,7 +101,7 @@ void MainWindow::processFiles()
 
 
     Q_FOREACH (QString date, dateToFiles.keys()) {
-        auto filesToProcess = dateToFiles.value(date);
+        QStringList filesToProcess = dateToFiles.value(date);
         processDateFiles(date, filesToProcess);
     }
 
@@ -204,10 +204,10 @@ void MainWindow::processDateFiles(QString &date, QStringList &filetoProcess)
 
 void MainWindow::printpdf()
 {
-    QDir targetDir = QDir(ui->email_path_edit->text() + "/pdfs");
-    if (!targetDir.exists()) {
-        targetDir.mkpath(targetDir.path());
-    }
+//    QDir targetDir = QDir(ui->email_path_edit->text() + "/pdfs");
+//    if (!targetDir.exists()) {
+//        targetDir.mkpath(targetDir.path());
+//    }
 
     Q_FOREACH(QVariant date, dateToSold.keys()) {
         QDate billDate = QDate::fromString(date.toString(), "yyyyMMdd");
@@ -308,6 +308,12 @@ void MainWindow::billHtmlSave(const QDate &date, QString htmlBillingAddress,
     // udate session totals
     totalSold += grandTotal;
     totalTaxCollected += taxes;
+
+    QDir targetDir = QDir(ui->email_path_edit->text() + "/pdfs");
+    if (!targetDir.exists()) {
+        qDebug() << "creating dir: " << targetDir.path();
+        targetDir.mkpath(targetDir.path());
+    }
 
     QString printFile = ui->email_path_edit->text() + "/pdfs/bill_no_" + billNumberPrefix + ui->start_number_edit->text() + ".pdf";
     qDebug() << "pdf file name: " << printFile;
