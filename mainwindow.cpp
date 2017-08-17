@@ -37,7 +37,8 @@ void MainWindow::loadSettings()
     ui->invoice_template_edit->setText(m_settings->value("invoice-template", defaultPath).toString());
     ui->signature_path_edit->setText(m_settings->value("signature-file", defaultPath).toString());
     ui->start_number_edit->setText(m_settings->value("invoice_number", "1").toString());
-    ui->taxRateField->setText(m_settings->value("tax_rate", "5.25").toString());
+    ui->cgst_field->setText(m_settings->value("cgst_tax_rate", "9").toString());
+    ui->sgst_field->setText(m_settings->value("sgst_tax_rate", "9").toString());
 }
 
 void MainWindow::saveSetttings()
@@ -46,7 +47,8 @@ void MainWindow::saveSetttings()
     m_settings->setValue("invoice-template", ui->invoice_template_edit->text());
     m_settings->setValue("signature-file", ui->signature_path_edit->text());
     m_settings->setValue("invoice_number", ui->start_number_edit->text());
-    m_settings->setValue("tax_rate", ui->taxRateField->text());
+    m_settings->setValue("cgst_tax_rate", ui->cgst_field->text());
+    m_settings->setValue("sgst_tax_rate", ui->sgst_field->text());
 }
 
 MainWindow::~MainWindow()
@@ -246,11 +248,11 @@ void MainWindow::printCustomerBill(const QDate &date, QVariantList sameCustomerL
         itemDescriptions << itemDesc;
     }
 
-    billHtmlSave(date,billingAddress,itemDescriptions, ui->taxRateField->text().toFloat());
+    billHtmlSave(date,billingAddress,itemDescriptions, ui->cgst_field->text().toFloat(), ui->sgst_field->text().toFloat());
 }
 
 void MainWindow::billHtmlSave(const QDate &date, QString htmlBillingAddress,
-                              QList<ItemEntries> &itemDescriptions, double taxRate, double shipping)
+                              QList<ItemEntries> &itemDescriptions, double cgstTaxRate, double sgstTaxRate, double shipping)
 {
     QFile file(ui->invoice_template_edit->text());
     if(!file.open(QFile::ReadOnly)) {
@@ -269,7 +271,7 @@ void MainWindow::billHtmlSave(const QDate &date, QString htmlBillingAddress,
     Q_FOREACH(const ItemEntries &itemDesc, itemDescriptions) {
 
         // convert price including tax to price without tax
-        double price = itemDesc.price/(1.0+taxRate/100);
+        double price = itemDesc.price/(1.0+(cgstTaxRate+sgstTaxRate)/100);
 
         double total = price*itemDesc.quantity;
 
@@ -284,13 +286,16 @@ void MainWindow::billHtmlSave(const QDate &date, QString htmlBillingAddress,
     }
 
 
-    double taxes = subtotal*(taxRate/100);
-    double grandTotal = subtotal + taxes;
+    double cgst_taxes = subtotal*(cgstTaxRate/100);
+    double sgst_taxes = subtotal*(sgstTaxRate/100);
+    double grandTotal = subtotal + cgst_taxes + sgst_taxes;
 
     htmlString.replace("$items_tags", htmlItemLine);
     htmlString.replace("$subtotal", QString("%1").arg(subtotal));
-    htmlString.replace("$taxRate", QString("%1%").arg(taxRate));
-    htmlString.replace("$taxes", QString("%1").arg(taxes));
+    htmlString.replace("$cgstTaxRate", QString("%1%").arg(cgstTaxRate));
+    htmlString.replace("$sgstTaxRate", QString("%1%").arg(sgstTaxRate));
+    htmlString.replace("$cgst_taxes", QString("%1").arg(cgst_taxes));
+    htmlString.replace("$sgst_taxes", QString("%1").arg(cgst_taxes));
 
 
     // shipping is a special case and is used only when shipping is non zero
@@ -307,7 +312,8 @@ void MainWindow::billHtmlSave(const QDate &date, QString htmlBillingAddress,
 
     // udate session totals
     totalSold += grandTotal;
-    totalTaxCollected += taxes;
+    totalTaxCollected += cgst_taxes;
+    totalTaxCollected += sgst_taxes;
 
     QDir targetDir = QDir(ui->email_path_edit->text() + "/pdfs");
     if (!targetDir.exists()) {
@@ -416,7 +422,7 @@ void MainWindow::on_manualGenerateButton_clicked()
     QString billingAddress = ui->addressField->toHtml();
 
     billHtmlSave(ui->billDateEdit->date(), billingAddress, m_manualItemDescs,
-                 ui->taxRateField->text().toFloat(), ui->shipping_edit->text().toFloat());
+                 ui->cgst_field->text().toFloat(), ui->sgst_field->text().toFloat(), ui->shipping_edit->text().toFloat());
 
     ui->manualBillStatus->setText("manual bill generated and saved");
 }
