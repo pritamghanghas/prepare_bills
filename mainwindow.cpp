@@ -282,8 +282,8 @@ void MainWindow::billHtmlSave(const QDate &date, QString htmlBillingAddress,
         htmlItemLine += itemLine;
         htmlItemLine.replace("$itemNamePlaceholder", itemDesc.itemName);
         htmlItemLine.replace("$quantity", QString("%1").arg(itemDesc.quantity));
-        htmlItemLine.replace("$price", QString("%1").arg(price));
-        htmlItemLine.replace("$total", QString("%1").arg(total));
+        htmlItemLine.replace("$price", QString("%1").arg(price, 0, 'f', 2));
+        htmlItemLine.replace("$total", QString("%1").arg(total, 0, 'f', 2));
 
     }
 
@@ -292,13 +292,13 @@ void MainWindow::billHtmlSave(const QDate &date, QString htmlBillingAddress,
     double sgst_taxes = subtotal*(sgstTaxRate/100);
     double grandTotal = subtotal + cgst_taxes + sgst_taxes;
 
-    htmlString.replace("$gst", ui->gst_number->text());
+    htmlString.replace("$gstin", ui->gst_number->text());
     htmlString.replace("$items_tags", htmlItemLine);
-    htmlString.replace("$subtotal", QString("%1").arg(subtotal));
-    htmlString.replace("$cgstTaxRate", QString("%1%").arg(cgstTaxRate));
-    htmlString.replace("$sgstTaxRate", QString("%1%").arg(sgstTaxRate));
-    htmlString.replace("$cgst_taxes", QString("%1").arg(cgst_taxes));
-    htmlString.replace("$sgst_taxes", QString("%1").arg(cgst_taxes));
+    htmlString.replace("$subtotal", QString("%1").arg(subtotal, 0, 'f', 2));
+    htmlString.replace("$cgstTaxRate", QString("%1%").arg(cgstTaxRate, 0, 'f', 2));
+    htmlString.replace("$sgstTaxRate", QString("%1%").arg(sgstTaxRate, 0, 'f', 2));
+    htmlString.replace("$cgst_taxes", QString("%1").arg(cgst_taxes, 0, 'f', 2));
+    htmlString.replace("$sgst_taxes", QString("%1").arg(cgst_taxes, 0, 'f', 2));
 
 
     // shipping is a special case and is used only when shipping is non zero
@@ -309,7 +309,7 @@ void MainWindow::billHtmlSave(const QDate &date, QString htmlBillingAddress,
     }
     htmlString.replace("$shipping_line", shippingChargesLine);
 
-    htmlString.replace("$grandtotal", QString("%1").arg(grandTotal+shipping));
+    htmlString.replace("$grandtotal", QString("%1").arg(grandTotal+shipping, 0, 'f', 2));
     htmlString.replace("$signature", ui->signature_path_edit->text());
     htmlString.replace("$invoice_number", billNumberPrefix + ui->start_number_edit->text());
 
