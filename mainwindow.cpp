@@ -312,7 +312,7 @@ void MainWindow::billHtmlSave(const QDate &date, QString htmlBillingAddress,
     htmlString.replace("$shipping_line", shippingChargesLine);
 
     htmlString.replace("$grandtotal", QString("%1").arg(grandTotal+shipping, 0, 'f', 2));
-    htmlString.replace("$signature", ui->signature_path_edit->text());
+    htmlString.replace("$signature", "file://" + ui->signature_path_edit->text());
     htmlString.replace("$invoice_number", billNumberPrefix + ui->start_number_edit->text());
 
     // udate session totals

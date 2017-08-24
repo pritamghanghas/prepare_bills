@@ -119,7 +119,7 @@
       <item row="5" column="6">
        <widget class="QPushButton" name="signature_button">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="text">
          <string>browse</string>
