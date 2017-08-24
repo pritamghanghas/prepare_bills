@@ -40,6 +40,7 @@ void MainWindow::loadSettings()
     ui->cgst_field->setText(m_settings->value("cgst_tax_rate", "9").toString());
     ui->sgst_field->setText(m_settings->value("sgst_tax_rate", "9").toString());
     ui->gst_number->setText(m_settings->value("gstin").toString());
+    ui->companyName->setText(m_settings->value("company_name").toString());
 }
 
 void MainWindow::saveSetttings()
@@ -50,7 +51,7 @@ void MainWindow::saveSetttings()
     m_settings->setValue("invoice_number", ui->start_number_edit->text());
     m_settings->setValue("cgst_tax_rate", ui->cgst_field->text());
     m_settings->setValue("sgst_tax_rate", ui->sgst_field->text());
-    m_settings->setValue("gstin", ui->gst_number->text());
+    m_settings->setValue("company_name", ui->companyName->text());
 }
 
 MainWindow::~MainWindow()
@@ -292,6 +293,7 @@ void MainWindow::billHtmlSave(const QDate &date, QString htmlBillingAddress,
     double sgst_taxes = subtotal*(sgstTaxRate/100);
     double grandTotal = subtotal + cgst_taxes + sgst_taxes;
 
+    htmlString.replace("$company_name", ui->companyName->text());
     htmlString.replace("$gstin", ui->gst_number->text());
     htmlString.replace("$items_tags", htmlItemLine);
     htmlString.replace("$subtotal", QString("%1").arg(subtotal, 0, 'f', 2));
@@ -405,6 +407,10 @@ void MainWindow::on_checkBox_toggled(bool checked)
    ui->priceField->setEnabled(checked);
    ui->addressField->setEnabled(checked);
    ui->manualGenerateButton->setEnabled(checked);
+   ui->addItemButton->setEnabled(checked);
+   ui->clear_item_button->setEnabled(checked);
+   ui->shipping_edit->setEnabled(checked);
+   ui->billDateEdit->setEnabled(checked);
 }
 
 void MainWindow::on_manualGenerateButton_clicked()
@@ -445,15 +451,33 @@ void MainWindow::on_addItemButton_clicked()
     itemDesc.quantity = ui->quantityField->text().toInt();
     itemDesc.price = ui->priceField->text().toDouble();
 
-    QString itemHtml = ui->itemsEdit->toHtml();
-    itemHtml += itemLine;
+    m_manualItemDescs << itemDesc;
 
-    itemHtml.replace("$itemNamePlaceholder", itemDesc.itemName);
-    itemHtml.replace("$quantity", QString("%1").arg(itemDesc.quantity));
-    itemHtml.replace("$price", QString("%1").arg(itemDesc.price));
-    itemHtml.replace("$total", QString(""));
+    populateItemsEdit();
+}
+
+void MainWindow::populateItemsEdit()
+{
+    QString itemHtml;
+
+    Q_FOREACH (const ItemEntries itemDesc, m_manualItemDescs)
+    {
+        QString newLine = itemLine;
+
+        newLine.replace("$itemNamePlaceholder", itemDesc.itemName);
+        newLine.replace("$quantity", QString("%1").arg(itemDesc.quantity));
+        newLine.replace("$price", QString("%1").arg(itemDesc.price));
+        newLine.replace("$total", QString(""));
+
+        itemHtml += newLine;
+    }
 
     ui->itemsEdit->setHtml(itemHtml);
+}
 
-    m_manualItemDescs << itemDesc;
+void MainWindow::on_clear_item_button_clicked()
+{
+    m_manualItemDescs.takeLast();
+
+    populateItemsEdit();
 }

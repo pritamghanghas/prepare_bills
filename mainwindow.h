@@ -42,6 +42,8 @@ private slots:
 
     void on_addItemButton_clicked();
 
+    void on_clear_item_button_clicked();
+
 private:
     void loadSettings();
     void saveSetttings();
@@ -53,6 +55,7 @@ private:
                      QList<ItemEntries> &itemDescriptions, double cgstTaxRate, double sgstTaxRate, double shipping = 0);
     void delay(int seconds);
     void writeTotalTxt();
+    void populateItemsEdit();
 
     Ui::MainWindow *ui;
 

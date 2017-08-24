@@ -10,6 +10,12 @@
     <height>714</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>10</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
@@ -106,7 +112,7 @@
       <item row="5" column="2" colspan="4">
        <widget class="QLineEdit" name="signature_path_edit">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -137,6 +143,16 @@
         </property>
        </widget>
       </item>
+      <item row="0" column="4">
+       <widget class="QLabel" name="label_10">
+        <property name="text">
+         <string>Company Name</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="5">
+       <widget class="QLineEdit" name="companyName"/>
+      </item>
      </layout>
     </item>
     <item>
@@ -161,7 +177,7 @@
      </widget>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
        <widget class="QLabel" name="label_4">
         <property name="text">
@@ -170,31 +186,105 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="itemNameField"/>
+       <widget class="QLineEdit" name="itemNameField">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout">
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
        <widget class="QLabel" name="label_5">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text">
          <string>Quantity</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="quantityField"/>
+       <widget class="QLineEdit" name="quantityField">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QLabel" name="label_7">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text">
          <string>Price</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="priceField"/>
+       <widget class="QLineEdit" name="priceField">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="addItemButton">
+        <property name="text">
+         <string>add</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="clear_item_button">
+        <property name="text">
+         <string>clear</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_5">
+      <item>
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Bill Date</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDateEdit" name="billDateEdit"/>
       </item>
       <item>
        <widget class="QLabel" name="label_9">
@@ -207,21 +297,17 @@
        <widget class="QLineEdit" name="shipping_edit"/>
       </item>
       <item>
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Bill Date</string>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QDateEdit" name="billDateEdit"/>
-      </item>
-      <item>
-       <widget class="QPushButton" name="addItemButton">
-        <property name="text">
-         <string>add</string>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
         </property>
-       </widget>
+       </spacer>
       </item>
      </layout>
     </item>
@@ -277,11 +363,25 @@
    <zorder>checkBox</zorder>
    <zorder>itemsEdit</zorder>
    <zorder></zorder>
-   <zorder>sgst_label</zorder>
-   <zorder>sgst_field</zorder>
-   <zorder>label_8</zorder>
-   <zorder>gst_number</zorder>
    <zorder></zorder>
+   <zorder>clear_item_button</zorder>
+   <zorder>label_3</zorder>
+   <zorder>addItemButton</zorder>
+   <zorder>billDateEdit</zorder>
+   <zorder>label_9</zorder>
+   <zorder>shipping_edit</zorder>
+   <zorder>label_4</zorder>
+   <zorder>itemNameField</zorder>
+   <zorder>label_5</zorder>
+   <zorder>quantityField</zorder>
+   <zorder>quantityField</zorder>
+   <zorder>label_7</zorder>
+   <zorder>label_5</zorder>
+   <zorder>quantityField</zorder>
+   <zorder>label_7</zorder>
+   <zorder>priceField</zorder>
+   <zorder>addItemButton</zorder>
+   <zorder>clear_item_button</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
