@@ -22,12 +22,14 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     totalSold = 0;
-    totalTaxCollected = 0;
+    totalCGSTTaxCollected = 0;
     ui->billDateEdit->setDate(QDate::currentDate());
     on_checkBox_toggled(false);
 
     m_settings = new QSettings("hoverbirds", "invoice", this);
     loadSettings();
+
+    _isLocal = false;
 }
 
 void MainWindow::loadSettings()
@@ -39,6 +41,7 @@ void MainWindow::loadSettings()
     ui->start_number_edit->setText(m_settings->value("invoice_number", "1").toString());
     ui->cgst_field->setText(m_settings->value("cgst_tax_rate", "9").toString());
     ui->sgst_field->setText(m_settings->value("sgst_tax_rate", "9").toString());
+    ui->igst_field->setText(m_settings->value("igst_tax_rate", "18").toString());
     ui->gst_number->setText(m_settings->value("gstin").toString());
     ui->companyName->setText(m_settings->value("company_name").toString());
 }
@@ -51,6 +54,7 @@ void MainWindow::saveSetttings()
     m_settings->setValue("invoice_number", ui->start_number_edit->text());
     m_settings->setValue("cgst_tax_rate", ui->cgst_field->text());
     m_settings->setValue("sgst_tax_rate", ui->sgst_field->text());
+    m_settings->setValue("igst_tax_rate", ui->igst_field->text());
     m_settings->setValue("company_name", ui->companyName->text());
 }
 
@@ -76,7 +80,9 @@ void MainWindow::on_start_button_clicked()
     // clean up old state if any
     dateToSold.clear();
     totalSold = 0;
-    totalTaxCollected = 0;
+    totalCGSTTaxCollected = 0;
+    totalSGSTTaxCollected = 0;
+    totalIGSTTaxCollected = 0;
     dateToFiles.clear();
 
     QDir dir(ui->email_path_edit->text());
@@ -112,7 +118,7 @@ void MainWindow::processFiles()
 
     printpdf();
 
-    ui->value_label->setText(QString(ui->value_label->text()).arg(totalSold).arg(totalTaxCollected));
+    ui->value_label->setText(QString(ui->value_label->text()).arg(totalSold).arg(totalCGSTTaxCollected));
 
     writeTotalTxt();
 }
@@ -129,8 +135,9 @@ void MainWindow::writeTotalTxt()
 
      QTextStream out(&totalFile);
      out << "Total sold including tax: " << totalSold << "\n";
-     out << "Total tax collected: " << totalTaxCollected << "\n";
-
+     out << "Total CGST tax collected: " << totalCGSTTaxCollected << "\n";
+     out << "Total SGST tax collected: " << totalSGSTTaxCollected << "\n";
+     out << "Total IGST tax collected: " << totalIGSTTaxCollected << "\n";
 }
 
 
@@ -251,11 +258,13 @@ void MainWindow::printCustomerBill(const QDate &date, QVariantList sameCustomerL
         itemDescriptions << itemDesc;
     }
 
-    billHtmlSave(date,billingAddress,itemDescriptions, ui->cgst_field->text().toFloat(), ui->sgst_field->text().toFloat());
+    billHtmlSave(date,billingAddress,itemDescriptions, ui->cgst_field->text().toFloat(),
+                 ui->sgst_field->text().toFloat(), ui->igst_field->text().toFloat());
 }
 
 void MainWindow::billHtmlSave(const QDate &date, QString htmlBillingAddress,
-                              QList<ItemEntries> &itemDescriptions, double cgstTaxRate, double sgstTaxRate, double shipping)
+                              QList<ItemEntries> &itemDescriptions, double cgstTaxRate, double sgstTaxRate,
+                              double igstTaxRate, double shipping)
 {
     QFile file(ui->invoice_template_edit->text());
     if(!file.open(QFile::ReadOnly)) {
@@ -268,13 +277,20 @@ void MainWindow::billHtmlSave(const QDate &date, QString htmlBillingAddress,
     htmlString.replace("$date", date.toString("MMMM d, yyyy"));
     htmlString.replace("$billing_address", htmlBillingAddress);
 
+    bool isLocal = htmlBillingAddress.contains("haryana", Qt::CaseInsensitive);
+
     double subtotal = 0;
     QString htmlItemLine;
 
     Q_FOREACH(const ItemEntries &itemDesc, itemDescriptions) {
 
         // convert price including tax to price without tax
-        double price = itemDesc.price/(1.0+(cgstTaxRate+sgstTaxRate)/100);
+        double price = 0;
+        if (!isLocal) {
+            price = itemDesc.price/(1.0+(cgstTaxRate+sgstTaxRate)/100);
+        } else {
+            price = itemDesc.price/(1.0+igstTaxRate/100);
+        }
 
         double total = price*itemDesc.quantity;
 
@@ -289,9 +305,17 @@ void MainWindow::billHtmlSave(const QDate &date, QString htmlBillingAddress,
     }
 
 
-    double cgst_taxes = subtotal*(cgstTaxRate/100);
-    double sgst_taxes = subtotal*(sgstTaxRate/100);
-    double grandTotal = subtotal + cgst_taxes + sgst_taxes;
+    double cgst_taxes = 0;
+    double sgst_taxes = 0;
+    double igst_taxes = 0;
+    if (!isLocal) {
+        cgst_taxes = subtotal*(cgstTaxRate/100);
+        sgst_taxes = subtotal*(sgstTaxRate/100);
+    } else {
+        igst_taxes = subtotal*(igstTaxRate/100);
+    }
+
+    double grandTotal = subtotal + cgst_taxes + sgst_taxes + igst_taxes;
 
     htmlString.replace("$company_name", ui->companyName->text());
     htmlString.replace("$gstin", ui->gst_number->text());
@@ -299,8 +323,10 @@ void MainWindow::billHtmlSave(const QDate &date, QString htmlBillingAddress,
     htmlString.replace("$subtotal", QString("%1").arg(subtotal, 0, 'f', 2));
     htmlString.replace("$cgstTaxRate", QString("%1%").arg(cgstTaxRate, 0, 'f', 2));
     htmlString.replace("$sgstTaxRate", QString("%1%").arg(sgstTaxRate, 0, 'f', 2));
+    htmlString.replace("$igstTaxRate", QString("%1%").arg(igstTaxRate, 0, 'f', 2));
     htmlString.replace("$cgst_taxes", QString("%1").arg(cgst_taxes, 0, 'f', 2));
     htmlString.replace("$sgst_taxes", QString("%1").arg(cgst_taxes, 0, 'f', 2));
+    htmlString.replace("$igst_taxes", QString("%1").arg(igst_taxes, 0, 'f', 2));
 
 
     // shipping is a special case and is used only when shipping is non zero
@@ -317,8 +343,9 @@ void MainWindow::billHtmlSave(const QDate &date, QString htmlBillingAddress,
 
     // udate session totals
     totalSold += grandTotal;
-    totalTaxCollected += cgst_taxes;
-    totalTaxCollected += sgst_taxes;
+    totalCGSTTaxCollected += cgst_taxes;
+    totalSGSTTaxCollected += sgst_taxes;
+    totalIGSTTaxCollected += igst_taxes;
 
     QDir targetDir = QDir(ui->email_path_edit->text() + "/pdfs");
     if (!targetDir.exists()) {
@@ -431,7 +458,9 @@ void MainWindow::on_manualGenerateButton_clicked()
     QString billingAddress = ui->addressField->toHtml();
 
     billHtmlSave(ui->billDateEdit->date(), billingAddress, m_manualItemDescs,
-                 ui->cgst_field->text().toFloat(), ui->sgst_field->text().toFloat(), ui->shipping_edit->text().toFloat());
+                 ui->cgst_field->text().toFloat(), ui->sgst_field->text().toFloat(),
+                 ui->igst_field->text().toFloat(),
+                 ui->shipping_edit->text().toFloat());
 
     ui->manualBillStatus->setText("manual bill generated and saved");
 }
